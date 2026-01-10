@@ -1,5 +1,5 @@
 
-import { MarksData, ScoreData, BiasData } from './types';
+import { MarksData, ScoreData, BiasData } from './types.ts';
 
 // Utility to generate mock data for the audit since real file loading is handled by the user
 export const generateMockData = () => {
