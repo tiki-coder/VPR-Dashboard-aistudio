@@ -1,17 +1,15 @@
 
 import React, { useState, useMemo } from 'react';
-import DashboardHeader from './components/DashboardHeader.tsx';
-import StatsCards from './components/StatsCards.tsx';
-import AnalysisCharts from './components/AnalysisCharts.tsx';
-import BiasAnalysis from './components/BiasAnalysis.tsx';
-import { generateMockData } from './dataProcessor.ts';
-import { FilterState, StatsSummary } from './types.ts';
+import DashboardHeader from './components/DashboardHeader';
+import StatsCards from './components/StatsCards';
+import AnalysisCharts from './components/AnalysisCharts';
+import BiasAnalysis from './components/BiasAnalysis';
+import { generateMockData } from './dataProcessor';
+import { FilterState, StatsSummary } from './types';
 
 const App: React.FC = () => {
-  // Master data
   const { marks, scores, bias } = useMemo(() => generateMockData(), []);
   
-  // Filter state
   const [filters, setFilters] = useState<FilterState>({
     year: '2023',
     grade: '',
@@ -24,7 +22,6 @@ const App: React.FC = () => {
     setFilters(prev => ({ ...prev, [key]: value }));
   };
 
-  // Compute Filter Options using marks source
   const filterOptions = useMemo(() => {
     return {
       years: Array.from(new Set(marks.map(m => m.Year.toString()))).sort().reverse(),
@@ -37,7 +34,6 @@ const App: React.FC = () => {
     };
   }, [marks, filters.municipality]);
 
-  // Filtered Data from Marks source
   const filteredMarks = useMemo(() => {
     return marks.filter(m => {
       const yearMatch = !filters.year || m.Year.toString() === filters.year;
@@ -49,7 +45,6 @@ const App: React.FC = () => {
     });
   }, [marks, filters]);
 
-  // Filtered Data from Scores source
   const filteredScores = useMemo(() => {
     return scores.filter(s => {
       const yearMatch = !filters.year || s.Year.toString() === filters.year;
@@ -61,7 +56,6 @@ const App: React.FC = () => {
     });
   }, [scores, filters]);
 
-  // Aggregate Stats
   const stats = useMemo<StatsSummary>(() => {
     const schools = new Set(filteredMarks.map(m => m.Login));
     const totalParticipants = filteredMarks.reduce((acc, m) => acc + m.Participants, 0);
@@ -80,7 +74,6 @@ const App: React.FC = () => {
     };
   }, [filteredMarks]);
 
-  // Chart Data Preparation
   const marksChartData = useMemo(() => {
     if (filteredMarks.length === 0) return [];
     const count = filteredMarks.length;
@@ -116,7 +109,6 @@ const App: React.FC = () => {
       .sort((a, b) => a.point - b.point);
   }, [filteredScores]);
 
-  // Bias logic
   const selectedYearInt = parseInt(filters.year) || 2023;
   
   const selectedSchoolBias = useMemo(() => {
