@@ -1,3 +1,4 @@
+
 import React, { useState, useMemo } from 'react';
 import DashboardHeader from './components/DashboardHeader';
 import StatsCards from './components/StatsCards';
@@ -27,9 +28,14 @@ const App: React.FC = () => {
   const filterOptions = useMemo(() => {
     return {
       years: Array.from(new Set(marks.map(m => m.Year.toString()))).sort().reverse(),
-      /*...*/
+      grades: Array.from(new Set(marks.map(m => m.Grade))).sort(),
+      subjects: Array.from(new Set(marks.map(m => m.Subject))).sort(),
+      municipalities: Array.from(new Set(marks.map(m => m.Municipality))).sort(),
+      oos: Array.from(new Set(marks
+        .filter(m => !filters.municipality || m.Municipality === filters.municipality)
+        .map(m => m.OO))).sort()
     };
-  }, [marks]);
+  }, [marks, filters.municipality]);
 
   // Filtered Data from Marks source
   const filteredMarks = useMemo(() => {
@@ -43,26 +49,34 @@ const App: React.FC = () => {
     });
   }, [marks, filters]);
 
-  // Aggregate Stats — исправлено: единое имя переменной и защита от деления на 0
+  // Filtered Data from Scores source
+  const filteredScores = useMemo(() => {
+    return scores.filter(s => {
+      const yearMatch = !filters.year || s.Year.toString() === filters.year;
+      const gradeMatch = !filters.grade || s.Grade === filters.grade;
+      const subMatch = !filters.subject || s.Subject === filters.subject;
+      const munMatch = !filters.municipality || s.Municipality === filters.municipality;
+      const ooMatch = !filters.oo || s.OO === filters.oo;
+      return yearMatch && gradeMatch && subMatch && munMatch && ooMatch;
+    });
+  }, [scores, filters]);
+
+  // Aggregate Stats
   const stats = useMemo<StatsSummary>(() => {
-    if (filteredMarks.length === 0) return { schoolCount: 0, participantCount: 0, successRate: 0, qualityRate: 0 };
-    
     const schools = new Set(filteredMarks.map(m => m.Login));
     const totalParticipants = filteredMarks.reduce((acc, m) => acc + m.Participants, 0);
-
-    // Защита от деления на 0 (если участники равны 0 — возвращаем 0% по метрикам)
-    if (totalParticipants === 0) {
-      return { schoolCount: schools.size, participantCount: 0, successRate: 0, qualityRate: 0 };
-    }
-
+    
+    if (filteredMarks.length === 0) return { schoolCount: 0, participantCount: 0, successRate: 0, qualityRate: 0 };
+    
+    const sumParticipants = filteredMarks.reduce((acc, m) => acc + m.Participants, 0);
     const successCount = filteredMarks.reduce((acc, m) => acc + (m.Participants * (m.Mark3 + m.Mark4 + m.Mark5) / 100), 0);
     const qualityCount = filteredMarks.reduce((acc, m) => acc + (m.Participants * (m.Mark4 + m.Mark5) / 100), 0);
 
     return {
       schoolCount: schools.size,
       participantCount: totalParticipants,
-      successRate: (successCount / totalParticipants) * 100,
-      qualityRate: (qualityCount / totalParticipants) * 100
+      successRate: (successCount / sumParticipants) * 100,
+      qualityRate: (qualityCount / sumParticipants) * 100
     };
   }, [filteredMarks]);
 
@@ -70,7 +84,16 @@ const App: React.FC = () => {
   const marksChartData = useMemo(() => {
     if (filteredMarks.length === 0) return [];
     const count = filteredMarks.length;
-    /*...*/
+    const avg2 = filteredMarks.reduce((acc, m) => acc + m.Mark2, 0) / count;
+    const avg3 = filteredMarks.reduce((acc, m) => acc + m.Mark3, 0) / count;
+    const avg4 = filteredMarks.reduce((acc, m) => acc + m.Mark4, 0) / count;
+    const avg5 = filteredMarks.reduce((acc, m) => acc + m.Mark5, 0) / count;
+    return [
+      { name: '2', value: Number(avg2.toFixed(1)) },
+      { name: '3', value: Number(avg3.toFixed(1)) },
+      { name: '4', value: Number(avg4.toFixed(1)) },
+      { name: '5', value: Number(avg5.toFixed(1)) }
+    ];
   }, [filteredMarks]);
 
   const scoresChartData = useMemo(() => {
@@ -78,9 +101,19 @@ const App: React.FC = () => {
     
     const pointAgg: Record<number, number[]> = {};
     filteredScores.forEach(item => {
-      /*...*/
+      Object.entries(item.Scores).forEach(([pt, val]) => {
+        const p = Number(pt);
+        if (!pointAgg[p]) pointAgg[p] = [];
+        pointAgg[p].push(val);
+      });
     });
-    /*...*/
+
+    return Object.entries(pointAgg)
+      .map(([pt, vals]) => ({
+        point: Number(pt),
+        percentage: Number((vals.reduce((a, b) => a + b, 0) / vals.length).toFixed(1))
+      }))
+      .sort((a, b) => a.point - b.point);
   }, [filteredScores]);
 
   // Bias logic
@@ -93,8 +126,19 @@ const App: React.FC = () => {
 
   const municipalityBiasList = useMemo(() => {
     if (!filters.municipality) return [];
-    /*...*/
+    return bias.filter(b => b.Year === selectedYearInt && b.Municipality === filters.municipality && b.MarkerCount > 0);
   }, [bias, filters.municipality, selectedYearInt]);
+
+  const biasTrend = useMemo(() => {
+    // Years in ascending order: oldest to newest
+    const yearsArr = [selectedYearInt - 2, selectedYearInt - 1, selectedYearInt];
+    return yearsArr.map(y => {
+      const yearSchools = new Set(marks.filter(m => m.Year === y).map(m => m.Login));
+      const yearBiased = new Set(bias.filter(b => b.Year === y && b.MarkerCount > 0).map(b => b.Login));
+      const percent = yearSchools.size > 0 ? (yearBiased.size / yearSchools.size) * 100 : 0;
+      return { year: y, percent: Number(percent.toFixed(1)) };
+    });
+  }, [marks, bias, selectedYearInt]);
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 transition-colors">
@@ -120,7 +164,8 @@ const App: React.FC = () => {
         <BiasAnalysis 
           selectedSchoolBias={selectedSchoolBias}
           biasTrend={biasTrend}
-          /*...*/
+          municipalityBiasList={municipalityBiasList}
+          selectedYear={selectedYearInt}
         />
       </main>
       
