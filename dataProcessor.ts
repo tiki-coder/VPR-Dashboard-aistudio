@@ -1,4 +1,3 @@
-
 import { MarksData, ScoreData, BiasData } from './types';
 
 // Utility to generate mock data for the audit since real file loading is handled by the user
@@ -38,25 +37,37 @@ export const generateMockData = () => {
             for (let s = 0; s <= maxScore; s++) {
               scoreMap[s] = Math.random() * 10;
             }
+
+            // Нормализуем распределение так, чтобы сумма процентов была 100 (или близко к тому)
+            const total = Object.values(scoreMap).reduce((a, b) => a + b, 0);
+            if (total > 0) {
+              Object.keys(scoreMap).forEach(k => {
+                const key = Number(k);
+                scoreMap[key] = Number(((scoreMap[key] / total) * 100).toFixed(2));
+              });
+            }
+
             scores.push({
               Year: year, Grade: grade, Subject: subject, Municipality: mun,
               Login: login, OO: oo, Participants: participants,
               Scores: scoreMap
             });
+
+            // Bias - простой пример
+            bias.push({
+              Year: year, Login: login, Municipality: mun, OO: oo,
+              Markers: Math.random() > 0.9 ? ["Низкая выборка","Необъективность"] : [],
+              MarkerCount: 0 // затем перезапишем ниже
+            });
           });
         });
-
-        // Bias markers (some schools have them)
-        if (Math.random() > 0.8) {
-          const markers = year === 2023 ? ["4 РУ", "4 МА"] : ["4 РУ"];
-          bias.push({
-            Year: year, Login: login, Municipality: mun, OO: oo,
-            Markers: markers,
-            MarkerCount: markers.length
-          });
-        }
       });
     }
+  });
+
+  // Посчитаем реальные MarkerCount
+  bias.forEach(b => {
+    b.MarkerCount = b.Markers.length;
   });
 
   return { marks, scores, bias };
