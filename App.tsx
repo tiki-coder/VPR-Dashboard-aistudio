@@ -1,14 +1,14 @@
 
 import React, { useState, useMemo } from 'react';
-import DashboardHeader from './components/DashboardHeader';
-import StatsCards from './components/StatsCards';
-import AnalysisCharts from './components/AnalysisCharts';
-import BiasAnalysis from './components/BiasAnalysis';
-import { generateMockData } from './dataProcessor';
-import { FilterState, StatsSummary } from './types';
+import DashboardHeader from './components/DashboardHeader.tsx';
+import StatsCards from './components/StatsCards.tsx';
+import AnalysisCharts from './components/AnalysisCharts.tsx';
+import BiasAnalysis from './components/BiasAnalysis.tsx';
+import { generateMockData } from './dataProcessor.ts';
+import { FilterState, StatsSummary } from './types.ts';
 
 const App: React.FC = () => {
-  // Master data - conceptually separated into 3 sources
+  // Master data
   const { marks, scores, bias } = useMemo(() => generateMockData(), []);
   
   // Filter state
@@ -130,7 +130,6 @@ const App: React.FC = () => {
   }, [bias, filters.municipality, selectedYearInt]);
 
   const biasTrend = useMemo(() => {
-    // Years in ascending order: oldest to newest
     const yearsArr = [selectedYearInt - 2, selectedYearInt - 1, selectedYearInt];
     return yearsArr.map(y => {
       const yearSchools = new Set(marks.filter(m => m.Year === y).map(m => m.Login));
