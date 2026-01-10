@@ -7,26 +7,39 @@
     <title>ВПР Дашборд Аналитики</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700;900&display=swap" rel="stylesheet">
     <style>
-        body {
-            font-family: 'Roboto', sans-serif;
-            background-color: #f8fafc;
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; margin: 0; }
+        .dark body { background-color: #0f172a; }
+        
+        /* Скрываем только системные элементы Streamlit, не трогая header приложения */
+        /* Используем более специфичные селекторы */
+        header[data-testid="stHeader"], 
+        footer, 
+        .stAppDeployButton, 
+        #MainMenu, 
+        .viewerBadge_container__1QSob { 
+            display: none !important; 
         }
-        .dark body {
-            background-color: #0f172a;
-        }
+
+        /* Плавная анимация загрузки */
+        #root:empty { height: 100vh; display: flex; align-items: center; justify-content: center; background: white; }
+        #root:empty::after { content: ""; width: 40px; height: 40px; border: 4px solid #e2e8f0; border-top-color: #6366f1; border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
     </style>
 <script type="importmap">
 {
   "imports": {
-    "react": "https://esm.sh/react@^19.2.3",
+    "react": "https://esm.sh/react@19.0.0",
+    "react-dom": "https://esm.sh/react-dom@19.0.0",
+    "react-dom/client": "https://esm.sh/react-dom@19.0.0/client",
+    "recharts": "https://esm.sh/recharts@2.13.0?deps=react@19.0.0,react-dom@19.0.0",
     "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
-    "react/": "https://esm.sh/react@^19.2.3/",
-    "recharts": "https://esm.sh/recharts@^3.6.0"
+    "react/": "https://esm.sh/react@^19.2.3/"
   }
 }
 </script>
+<script type="module" src="./index.tsx"></script>
 </head>
 <body>
     <div id="root"></div>
