@@ -1,63 +1,51 @@
 
-import { MarksData, ScoreData, BiasData } from './types';
-
-// Utility to generate mock data for the audit since real file loading is handled by the user
-export const generateMockData = () => {
-  const municipalities = ["г. Махачкала", "г. Каспийск", "Агульский муниципальный район", "Акушинский муниципальный район"];
-  const subjects = ["Русский язык", "Математика", "Окружающий мир"];
-  const years = [2021, 2022, 2023];
-  const grades = ["4", "5"];
-
-  const marks: MarksData[] = [];
-  const scores: ScoreData[] = [];
-  const bias: BiasData[] = [];
-
-  municipalities.forEach(mun => {
-    for (let i = 1; i <= 10; i++) {
-      const login = `edu050${mun.charCodeAt(0)}${i}`;
-      const oo = `МБОУ Школа №${i} ${mun}`;
-      
-      years.forEach(year => {
-        grades.forEach(grade => {
-          subjects.forEach(subject => {
-            const participants = Math.floor(Math.random() * 200) + 50;
-            
-            // Marks
-            marks.push({
-              Year: year, Grade: grade, Subject: subject, Municipality: mun,
-              Login: login, OO: oo, Participants: participants,
-              Mark2: Math.random() * 15,
-              Mark3: Math.random() * 30 + 10,
-              Mark4: Math.random() * 40 + 20,
-              Mark5: Math.random() * 25 + 5
-            });
-
-            // Scores
-            const maxScore = subject === "Русский язык" ? 38 : 20;
-            const scoreMap: Record<number, number> = {};
-            for (let s = 0; s <= maxScore; s++) {
-              scoreMap[s] = Math.random() * 10;
-            }
-            scores.push({
-              Year: year, Grade: grade, Subject: subject, Municipality: mun,
-              Login: login, OO: oo, Participants: participants,
-              Scores: scoreMap
-            });
-          });
-        });
-
-        // Bias markers (some schools have them)
-        if (Math.random() > 0.8) {
-          const markers = year === 2023 ? ["4 РУ", "4 МА"] : ["4 РУ"];
-          bias.push({
-            Year: year, Login: login, Municipality: mun, OO: oo,
-            Markers: markers,
-            MarkerCount: markers.length
-          });
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ВПР Дашборд Аналитики</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f8fafc;
+            margin: 0;
         }
-      });
-    }
-  });
-
-  return { marks, scores, bias };
-};
+        .dark body {
+            background-color: #0f172a;
+        }
+        /* Скрытие системных элементов Streamlit */
+        header[data-testid="stHeader"], 
+        footer, 
+        .stAppDeployButton, 
+        #MainMenu, 
+        div[data-testid="stStatusWidget"] { 
+            display: none !important; 
+        }
+        /* Гарантия видимости нашего хедера */
+        .app-header {
+            display: block !important;
+            visibility: visible !important;
+        }
+    </style>
+<script type="importmap">
+{
+  "imports": {
+    "react": "https://esm.sh/react@19.0.0",
+    "react-dom": "https://esm.sh/react-dom@19.0.0",
+    "react-dom/client": "https://esm.sh/react-dom@19.0.0/client",
+    "recharts": "https://esm.sh/recharts@2.13.0?deps=react@19.0.0,react-dom@19.0.0",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
+    "react/": "https://esm.sh/react@^19.2.3/"
+  }
+}
+</script>
+<script type="module" src="./index.tsx"></script>
+</head>
+<body>
+    <div id="root"></div>
+</body>
+</html>
