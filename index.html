@@ -1,84 +1,12 @@
-
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ВПР Дашборд Аналитики</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Roboto', sans-serif;
-            background-color: #f8fafc;
-            margin: 0;
-            overflow-x: hidden;
-        }
-        .dark body {
-            background-color: #0f172a;
-        }
-        
-        header[data-testid="stHeader"], 
-        footer, 
-        .stAppDeployButton, 
-        #MainMenu, 
-        div[data-testid="stStatusWidget"] { 
-            display: none !important; 
-        }
-
-        #root:empty {
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            background: #ffffff;
-        }
-        .dark #root:empty {
-            background: #0f172a;
-        }
-        #root:empty::before {
-            content: "";
-            width: 64px;
-            height: 64px;
-            border: 5px solid #f1f5f9;
-            border-top: 5px solid #6366f1;
-            border-radius: 50%;
-            animation: spin 1s cubic-bezier(0.55, 0.055, 0.675, 0.19) infinite;
-            margin-bottom: 20px;
-        }
-        #root:empty::after {
-            content: "ЗАГРУЗКА АНАЛИТИКИ...";
-            font-weight: 900;
-            font-size: 12px;
-            letter-spacing: 0.2em;
-            color: #6366f1;
-            animation: pulse 1.5s ease-in-out infinite;
-        }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
-
-        .app-header {
-            display: block !important;
-            visibility: visible !important;
-        }
-    </style>
-<script type="importmap">
-{
-  "imports": {
-    "react": "https://esm.sh/react@19.0.0",
-    "react-dom": "https://esm.sh/react-dom@19.0.0",
-    "react-dom/client": "https://esm.sh/react-dom@19.0.0/client",
-    "recharts": "https://esm.sh/recharts@2.13.0?deps=react@19.0.0,react-dom@19.0.0",
-    "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
-    "react/": "https://esm.sh/react@^19.2.3/"
-  }
-}
-</script>
-<script type="module" src="index.tsx"></script>
-</head>
-<body>
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>VPR Dashboard</title>
+  </head>
+  <body>
     <div id="root"></div>
-</body>
+    <script type="module" src="./index.tsx"></script>
+  </body>
 </html>
