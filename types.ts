@@ -1,11 +1,10 @@
-
 export interface MarksData {
-  Year: number;
-  Grade: string;
+  Year: string;
+  Class: string;
   Subject: string;
   Municipality: string;
-  Login: string;
   OO: string;
+  Login: string;
   Participants: number;
   Mark2: number;
   Mark3: number;
@@ -14,36 +13,36 @@ export interface MarksData {
 }
 
 export interface ScoreData {
-  Year: number;
-  Grade: string;
+  Year: string;
+  Class: string;
   Subject: string;
   Municipality: string;
-  Login: string;
   OO: string;
-  Participants: number;
-  Scores: Record<number, number>; // Map of point: percentage
+  Login: string;
+  Point: number;
+  Percent: number;
 }
 
 export interface BiasData {
-  Year: number;
-  Login: string;
+  Year: string;
   Municipality: string;
   OO: string;
-  Markers: string[];
+  Login: string;
+  Marker: string;
   MarkerCount: number;
 }
 
-export interface FilterState {
+export type FilterState = {
   year: string;
-  grade: string;
+  classLevel: string;
   subject: string;
   municipality: string;
   oo: string;
-}
+};
 
-export interface StatsSummary {
+export type Stats = {
   schoolCount: number;
   participantCount: number;
-  successRate: number; // 3+4+5
-  qualityRate: number; // 4+5
-}
+  successRate: number;
+  qualityRate: number;
+};
