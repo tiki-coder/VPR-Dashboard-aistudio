@@ -1,48 +1,10 @@
 import streamlit as st
-import streamlit.components.v1 as components
+import os
 
-st.set_page_config(layout="wide", page_title="ВПР Дашборд")
-
-# Читаем наш готовый HTML
-with open("index.html", "r", encoding="utf-8") as f:
-    html_code = f.read()
-
-# Если `index.html` ссылается на локальные .ts/.tsx модули — фронтенд
-# скорее всего не собран. Показываем понятное сообщение с инструкциями
-if "index.tsx" in html_code or ".tsx" in html_code or ".ts" in html_code:
-    st.markdown(
-        """
-        <style>
-        /* Скрывает кнопку Fork и лишние элементы Streamlit */
-        header { visibility: hidden; }
-        </style>
-        """,
-        unsafe_allow_html=True,
-    )
-
-    st.error("Фронтенд не собран или подключён как TypeScript/TSX. Загрузка зависла.")
-    st.markdown(
-        "Чтобы встроить приложение, сначала соберите фронтенд (в корне проекта):"
-    )
-    st.code("npm install\nnpm run build", language="bash")
-    st.markdown(
-        "Либо отредактируйте `index.html`, чтобы он подключал уже собранный бандл JS вместо `index.tsx`."
-    )
+# Проверяем, существует ли собранный фронтенд
+if os.path.exists("dist/index.html"):
+    with open("dist/index.html", "r") as f:
+        html_data = f.read()
+    st.components.v1.html(html_data, height=1000, width=1200, scrolling=True)
 else:
-    # Скрываем кнопку Fork и другие элементы управления в самом Streamlit
-    st.markdown(
-        """
-        <style>
-        /* Скрывает кнопку Fork */
-        .stAppDeployButton { display: none !important; }
-        /* Скрывает иконку GitHub/Fork в правом углу */
-        [data-testid="stActionButtonIcon"] { display: none !important; }
-        /* Скрывает всё верхнее меню */
-        header { visibility: hidden; }
-        </style>
-        """,
-        unsafe_allow_html=True,
-    )
-
-    # Инжектим HTML в Streamlit (на весь экран)
-    components.html(html_code, height=2000, scrolling=True)
+    st.error("Фронтенд не собран. Выполните 'npm install && npm run build' локально и закоммитьте dist/ в репозиторий.")
